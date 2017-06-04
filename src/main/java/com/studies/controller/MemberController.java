@@ -1,10 +1,8 @@
 package com.studies.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,79 +15,73 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.studies.bean.MemberBean;
-import com.studies.entity.Member;
-import com.studies.repository.MemberRepository;
-import com.studies.util.MemberMapper;
+import com.studies.exception.ApplicationException;
+import com.studies.message.MessageEnum;
+import com.studies.service.MemberService;
 
 @RestController
 @RequestMapping(path = "/svc/v1/controller")
 public class MemberController {
 
 	@Autowired
-	private MemberRepository memberReposity;
+	private MemberService memberService;
 
 	@GetMapping(path = "/member/{idMember}")
-	public ResponseEntity<MemberBean> getMember(@PathVariable(name = "idMember") Integer id) {
+	public ResponseEntity<MemberBean> getMember(@PathVariable(name = "idMember") Integer id)
+			throws ApplicationException {
+		try {
+			MemberBean memberBean = memberService.findMember(id);
+			return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
 
-		MemberBean memberBean = null;
-		Member theMember = memberReposity.findOne(id);
-
-		if (theMember == null) {
-			return new ResponseEntity<MemberBean>(HttpStatus.NOT_FOUND);
+		} catch (ApplicationException e) {
+			return handleException(e);
 		}
-		memberBean = MemberMapper.toBean(theMember);
-		return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
+	}
+
+	private <T> ResponseEntity<T> handleException(ApplicationException e) throws ApplicationException {
+
+		if (MessageEnum.REGISTER_NOT_FOUND.code().equals(e.getCode())) {
+			return new ResponseEntity<T>(HttpStatus.NOT_FOUND);
+		} else {
+			throw e;
+		}
 	}
 
 	@DeleteMapping(path = "/member/{idMember}")
-	public ResponseEntity<Void> deleteMember(@PathVariable(name = "idMember") Integer id) {
-
+	public ResponseEntity<Void> deleteMember(@PathVariable(name = "idMember") Integer id) throws ApplicationException {
 		try {
-			memberReposity.delete(id);
-		} catch (EmptyResultDataAccessException e) {
-			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+			memberService.deleteMember(id);
+			return new ResponseEntity<Void>(HttpStatus.OK);
+			
+		} catch (ApplicationException e) {
+			return handleException(e);
 		}
-		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/members")
 	public ResponseEntity<List<MemberBean>> getMembers() {
 
-		List<MemberBean> memberBeans = null;
-		List<Member> theMembers = memberReposity.findAll();
-
-		if (theMembers != null) {
-			memberBeans = theMembers.stream().map(MemberMapper::toBean).collect(Collectors.toList());
-		}
+		List<MemberBean> memberBeans = memberService.findMembers();
 		return new ResponseEntity<List<MemberBean>>(memberBeans, HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/member")
 	public ResponseEntity<MemberBean> addMember(@RequestBody MemberBean newMember) {
 
-		Member member = MemberMapper.toEntity(newMember);
-		member.setId(null);
-		
-		Member theMember = memberReposity.save(member);
-		MemberBean memberBean = MemberMapper.toBean(theMember);
-
+		MemberBean memberBean = memberService.addMember(newMember);
 		return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
 	}
 
-	
 	@PutMapping(path = "/member/{idMember}")
-	public ResponseEntity<MemberBean> updateMember(@PathVariable Integer idMember, @RequestBody MemberBean newMember) {
+	public ResponseEntity<MemberBean> updateMember(@PathVariable Integer idMember, @RequestBody MemberBean newMember)
+			throws ApplicationException {
+		try {
+			newMember.setId(idMember);
+			MemberBean memberBean = memberService.updateMember(newMember);
+			return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
 
-		Member theMember = memberReposity.findOne(idMember);
-		if (theMember == null) {
-			return new ResponseEntity<MemberBean>(HttpStatus.NOT_FOUND);
+		} catch (ApplicationException e) {
+			return handleException(e);
 		}
-		Member member = MemberMapper.toEntity(newMember);
-		member.setId(idMember);
-		
-		theMember = memberReposity.save(member);
-		
-		MemberBean memberBean = MemberMapper.toBean(theMember);
-		return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
 	}
 }
