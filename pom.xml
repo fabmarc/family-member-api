@@ -19,6 +19,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.java.compiler>1.8</maven.java.compiler>
+		<java.version>1.8</java.version>
 	</properties>
 
 	<dependencies>
@@ -41,6 +42,11 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.5</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -66,7 +66,7 @@ public class MemberController {
 	}
 
 	@PostMapping(path = "/member")
-	public ResponseEntity<MemberBean> addMember(@RequestBody MemberBean newMember) {
+	public ResponseEntity<MemberBean> addMember(@RequestBody MemberBean newMember) throws ApplicationException {
 
 		MemberBean memberBean = memberService.addMember(newMember);
 		return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);

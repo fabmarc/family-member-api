@@ -79,4 +79,177 @@ public class MemberServiceUnitTest {
 		assertEquals(membersExpected, membersBean);
 	}
 
+	@Test
+	public void testAddMemberNull() throws ApplicationException {
+		try {
+			memberService.addMember(null);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+
+	@Test
+	public void testAddMemberRequiredFirstName() throws ApplicationException {
+		
+		MemberBean member = MemberBean.builder().lastName("Last Name").birthDate(new Date()).build();
+		try {
+			member.setFirstName(null);
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setFirstName("");
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setFirstName("   ");
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+
+	@Test
+	public void testAddMemberRequiredLastName() throws ApplicationException {
+		
+		MemberBean member = MemberBean.builder().firstName("First Name").birthDate(new Date()).build();
+		try {
+			member.setLastName(null);
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setLastName("");
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setLastName("   ");
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+
+	@Test
+	public void testAddMemberRequiredBirthDate() throws ApplicationException {
+		try {
+			MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").build();
+			memberService.addMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+
+	@Test
+	public void testUpdateMemberNull() throws ApplicationException {
+		try {
+			memberService.updateMember(null);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+	
+	@Test
+	public void testUpdateMemberRequiredId() throws ApplicationException {
+		try {
+			MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").birthDate(new Date()).build();
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+	
+	@Test
+	public void testUpdateMemberRequiredFirstName() throws ApplicationException {
+		
+		MemberBean member = MemberBean.builder().id(1).lastName("Last Name").birthDate(new Date()).build();
+		try {
+			member.setFirstName(null);
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setFirstName("");
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setFirstName("   ");
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+	
+	@Test
+	public void testUpdateMemberRequiredLastName() throws ApplicationException {
+		
+		MemberBean member = MemberBean.builder().firstName("First Name").birthDate(new Date()).build();
+		try {
+			member.setLastName(null);
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setLastName("");
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+		try {
+			member.setLastName("   ");
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+	
+	@Test
+	public void testUpdateMemberRequiredBirthDate() throws ApplicationException {
+		
+		MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").build();
+		try {
+			member.setBirthDate(null);
+			memberService.updateMember(member);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+
+	@Test
+	public void testDeleteMemberNull() throws ApplicationException {
+		try {
+			memberService.deleteMember(null);
+			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
+		} catch (ApplicationException e) {
+			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+		}
+	}
+	
 }
