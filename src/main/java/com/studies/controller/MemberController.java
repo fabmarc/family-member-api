@@ -27,8 +27,7 @@ public class MemberController {
 	private MemberService memberService;
 
 	@GetMapping(path = "/member/{idMember}")
-	public ResponseEntity<MemberBean> getMember(@PathVariable(name = "idMember") Integer id)
-			throws ApplicationException {
+	public ResponseEntity<MemberBean> getMember(@PathVariable(name = "idMember") Integer id) throws ApplicationException {
 		try {
 			MemberBean memberBean = memberService.findMember(id);
 			return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
@@ -52,7 +51,7 @@ public class MemberController {
 		try {
 			memberService.deleteMember(id);
 			return new ResponseEntity<Void>(HttpStatus.OK);
-			
+
 		} catch (ApplicationException e) {
 			return handleException(e);
 		}
@@ -76,8 +75,7 @@ public class MemberController {
 	public ResponseEntity<MemberBean> updateMember(@PathVariable Integer idMember, @RequestBody MemberBean newMember)
 			throws ApplicationException {
 		try {
-			newMember.setId(idMember);
-			MemberBean memberBean = memberService.updateMember(newMember);
+			MemberBean memberBean = memberService.updateMember(idMember, newMember);
 			return new ResponseEntity<MemberBean>(memberBean, HttpStatus.OK);
 
 		} catch (ApplicationException e) {

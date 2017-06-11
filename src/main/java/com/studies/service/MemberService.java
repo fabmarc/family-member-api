@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.studies.bean.MemberBean;
 import com.studies.entity.Member;
@@ -18,6 +21,7 @@ import com.studies.repository.MemberRepository;
 import com.studies.util.MemberMapper;
 
 @Service
+@Validated
 public class MemberService {
 
 	@Autowired
@@ -38,11 +42,7 @@ public class MemberService {
 		return memberBean;
 	}
 
-	public void deleteMember(Integer id) throws ApplicationException {
-
-		if (id == null) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "Id");
-		}
+	public void deleteMember(@NotNull Integer id) throws ApplicationException {
 		try {
 			memberReposity.delete(id);
 		} catch (EmptyResultDataAccessException e) {
@@ -63,9 +63,7 @@ public class MemberService {
 		return memberBeans;
 	}
 
-	public MemberBean addMember(MemberBean newMember) throws ApplicationException {
-
-		validateAddMember(newMember);
+	public MemberBean addMember(@Valid @NotNull MemberBean newMember) {
 
 		Member member = MemberMapper.toEntity(newMember);
 		member.setId(null);
@@ -76,30 +74,13 @@ public class MemberService {
 		return memberBean;
 	}
 
-	private void validateAddMember(MemberBean newMember) throws ApplicationException {
+	public MemberBean updateMember(@NotNull Integer id, @Valid @NotNull MemberBean newMember) throws ApplicationException {
 
-		if (newMember == null) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "Member");
-
-		} else if (StringUtils.isBlank(newMember.getFirstName())) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "First Name");
-
-		} else if (StringUtils.isBlank(newMember.getLastName())) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "Last Name");
-
-		} else if (newMember.getBirthDate() == null) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "Birth Date");
-		}
-	}
-
-	public MemberBean updateMember(MemberBean newMember) throws ApplicationException {
-
-		validateUpdateMember(newMember);
-
-		boolean found = memberReposity.exists(newMember.getId());
+		boolean found = memberReposity.exists(id);
 		if (!found) {
 			throw applicationException.create(MessageEnum.REGISTER_NOT_FOUND, "Member");
 		}
+		newMember.setId(id);
 		Member member = MemberMapper.toEntity(newMember);
 		Member theMember = memberReposity.save(member);
 		MemberBean memberBean = MemberMapper.toBean(theMember);
@@ -107,12 +88,4 @@ public class MemberService {
 		return memberBean;
 	}
 
-	private void validateUpdateMember(MemberBean newMember) throws ApplicationException {
-
-		validateAddMember(newMember);
-
-		if (newMember.getId() == null) {
-			throw applicationException.create(MessageEnum.REQUIRED_FIELD, "Id");
-		}
-	}
 }

@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,191 +67,164 @@ public class MemberServiceUnitTest {
 	@Test
 	public void testFindMembersNotEmpty() {
 
-		Member member1 = Member.builder().id(1).firstName("First Name 1").lastName("Last Name 1").birthDate(new Date()).build();
-		Member member2 = Member.builder().id(2).firstName("First Name 2").lastName("Last Name 2").birthDate(new Date()).build();
-		
+		Member member1 = Member.builder().id(1).firstName("First Name 1").lastName("Last Name 1").birthDate(new Date())
+				.build();
+		Member member2 = Member.builder().id(2).firstName("First Name 2").lastName("Last Name 2").birthDate(new Date())
+				.build();
+
 		List<Member> members = new ArrayList<Member>(2);
 		members.add(member1);
 		members.add(member2);
-		
+
 		List<MemberBean> membersExpected = members.stream().map(MemberMapper::toBean).collect(Collectors.toList());
-		
+
 		when(memberRepository.findAll()).thenReturn(members);
 		List<MemberBean> membersBean = memberService.findMembers();
 		assertEquals(membersExpected, membersBean);
 	}
 
-	@Test
+	@Test(expected = ConstraintViolationException.class)
 	public void testAddMemberNull() throws ApplicationException {
-		try {
-			memberService.addMember(null);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
+		memberService.addMember(null);
 	}
 
 	@Test
 	public void testAddMemberRequiredFirstName() throws ApplicationException {
-		
+
 		MemberBean member = MemberBean.builder().lastName("Last Name").birthDate(new Date()).build();
 		try {
 			member.setFirstName(null);
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setFirstName("");
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setFirstName("   ");
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 	}
 
 	@Test
-	public void testAddMemberRequiredLastName() throws ApplicationException {
-		
+	public void testAddMemberRequiredLastName() {
+
 		MemberBean member = MemberBean.builder().firstName("First Name").birthDate(new Date()).build();
 		try {
 			member.setLastName(null);
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setLastName("");
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setLastName("   ");
 			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 	}
 
-	@Test
-	public void testAddMemberRequiredBirthDate() throws ApplicationException {
-		try {
-			MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").build();
-			memberService.addMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
+	@Test(expected = ConstraintViolationException.class)
+	public void testAddMemberRequiredBirthDate() {
+
+		MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").build();
+		memberService.addMember(member);
 	}
 
-	@Test
+	@Test(expected = ConstraintViolationException.class)
 	public void testUpdateMemberNull() throws ApplicationException {
-		try {
-			memberService.updateMember(null);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
+		memberService.updateMember(null, null);
 	}
-	
-	@Test
+
+	@Test(expected = ConstraintViolationException.class)
 	public void testUpdateMemberRequiredId() throws ApplicationException {
-		try {
-			MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").birthDate(new Date()).build();
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
+
+		MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").birthDate(new Date()).build();
+		memberService.updateMember(null, member);
 	}
-	
+
 	@Test
 	public void testUpdateMemberRequiredFirstName() throws ApplicationException {
-		
+
 		MemberBean member = MemberBean.builder().id(1).lastName("Last Name").birthDate(new Date()).build();
 		try {
 			member.setFirstName(null);
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setFirstName("");
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 		try {
 			member.setFirstName("   ");
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
-	}
-	
-	@Test
-	public void testUpdateMemberRequiredLastName() throws ApplicationException {
-		
-		MemberBean member = MemberBean.builder().firstName("First Name").birthDate(new Date()).build();
-		try {
-			member.setLastName(null);
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
-		try {
-			member.setLastName("");
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
-		try {
-			member.setLastName("   ");
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
-		}
-	}
-	
-	@Test
-	public void testUpdateMemberRequiredBirthDate() throws ApplicationException {
-		
-		MemberBean member = MemberBean.builder().firstName("First Name").lastName("Last Name").build();
-		try {
-			member.setBirthDate(null);
-			memberService.updateMember(member);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 	}
 
 	@Test
-	public void testDeleteMemberNull() throws ApplicationException {
+	public void testUpdateMemberRequiredLastName() throws ApplicationException {
+
+		MemberBean member = MemberBean.builder().id(1).firstName("First Name").birthDate(new Date()).build();
 		try {
-			memberService.deleteMember(null);
-			fail("Expected ApplicationException(code = REQUIRED_FIELD)");
-		} catch (ApplicationException e) {
-			assertEquals(MessageEnum.REQUIRED_FIELD.code(), e.getCode());
+			member.setLastName(null);
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
+		}
+		try {
+			member.setLastName("");
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
+		}
+		try {
+			member.setLastName("   ");
+			memberService.updateMember(1, member);
+			fail("Expected ConstraintViolationException");
+		} catch (ConstraintViolationException e) {
+			// expected exception
 		}
 	}
-	
+
+	@Test(expected = ConstraintViolationException.class)
+	public void testUpdateMemberRequiredBirthDate() throws ApplicationException {
+
+		MemberBean member = MemberBean.builder().id(1).firstName("First Name").lastName("Last Name").build();
+		memberService.updateMember(1, member);
+	}
+
+	@Test(expected = ConstraintViolationException.class)
+	public void testDeleteMemberNull() throws ApplicationException {
+		memberService.deleteMember(null);
+	}
+
 }

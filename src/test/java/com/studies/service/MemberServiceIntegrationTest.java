@@ -86,7 +86,7 @@ public class MemberServiceIntegrationTest {
 		memberExpected.setLastName("Last Name Last Name");
 		memberExpected.setBirthDate(new Date());
 
-		MemberBean memberBean = memberService.updateMember(memberExpected);
+		MemberBean memberBean = memberService.updateMember(memberExpected.getId(), memberExpected);
 		assertEquals(memberExpected, memberBean);
 	}
 
@@ -94,7 +94,7 @@ public class MemberServiceIntegrationTest {
 	public void testUpdateInexistentMember() throws ApplicationException {
 		try {
 			MemberBean member = MemberBean.builder().id(-1).firstName("First Name").lastName("Last Name").birthDate(new Date()).build();
-			memberService.updateMember(member);
+			memberService.updateMember(-1, member);
 			fail("Expected ApplicationException(code = REGISTER_NOT_FOUND)");
 		} catch (ApplicationException e) {
 			assertEquals(MessageEnum.REGISTER_NOT_FOUND.code(), e.getCode());
